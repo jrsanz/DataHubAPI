@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -39,6 +40,11 @@ class ProductController extends Controller
         // Obtiene los datos de búsqueda
         $data = $request->input('data');
 
+        // Si no se proporcionan datos de búsqueda, devuelve un error
+        if (empty($data)) {
+            return response()->json(['message' => 'El parámetro data es obligatorio para la búsqueda'], 400);
+        }
+
         // Busca productos por nombre o precio
         $products = Product::where('name', 'LIKE', "%$data%")->orWhere('price', 'LIKE', "%$data%")->get();
         return response()->json($products, 200);
@@ -49,10 +55,10 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request Solicitud con los datos del producto.
      * @return \Illuminate\Http\JsonResponse Respuesta con el producto almacenado.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
         // Crea un nuevo producto
-        $product = Product::create($request->all());
+        $product = Product::create($request->validated());
         return response()->json($product, 201);
     }
 
@@ -62,10 +68,10 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product Producto a actualizar.
      * @return \Illuminate\Http\JsonResponse Respuesta con el producto actualizado.
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
         // Actualiza el producto seleccionado
-        $product->update($request->all());
+        $product->update($request->validated());
         return response()->json($product, 200);
     }
 
