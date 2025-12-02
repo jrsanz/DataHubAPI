@@ -2,12 +2,16 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Handler extends ExceptionHandler
 {
@@ -52,7 +56,7 @@ class Handler extends ExceptionHandler
                 ], 404);
             }
 
-            // Método HTTPi no permitido
+            // Método HTTP no permitido
             if ($exception instanceof MethodNotAllowedHttpException) {
                 return response()->json([
                     'error' => 'Método no permitido para la ruta ' . $request->path() . '.',
@@ -67,6 +71,38 @@ class Handler extends ExceptionHandler
                     'error' => $exception->errors(),
                     'status' => 422,
                 ], 422);
+            }
+
+            // Token JWT expirado
+            if ($exception instanceof TokenExpiredException) {
+                return response()->json([
+                    'error' => 'El token ha expirado, por favor inicie sesión de nuevo.',
+                    'status' => 401,
+                ], 401);
+            }
+
+            // Token JWT inválido
+            if ($exception instanceof TokenInvalidException) {
+                return response()->json([
+                    'error' => 'El token de acceso proporcionado es inválido.',
+                    'status' => 401,
+                ], 401);
+            }
+
+            // Token JWT no proporcionado
+            if ($exception instanceof JWTException) {
+                return response()->json([
+                    'error' => 'Debe proporcionar un token para acceder.',
+                    'status' => 401,
+                ], 401);
+            }
+
+            // Usuario no autenticado
+            if ($exception instanceof AuthenticationException) {
+                return response()->json([
+                    'error' => 'Token de acceso inválido o no proporcionado.',
+                    'status' => 401,
+                ], 401);
             }
 
             // Respuesta por defecto para otros errores
