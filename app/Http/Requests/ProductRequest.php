@@ -21,11 +21,21 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Revistar si el método es POST o PUT/PATCH para aplicar reglas específicas
+        $isUpdate = in_array($this->method(), ['PUT', 'PATCH']);
+        $rule = $isUpdate ? 'sometimes' : 'required';
+
+        // Valida si el request es de actualización y no hay datos
+        if (empty($this->all() && $isUpdate)) {
+            abort(response()->json(['message' => 'Es necesario enviar datos para actualizar el producto.'], 422));
+        }
+
+        // Reglas de validación para crear o actualizar un producto
         return [
-            'name' => 'required|string|max:255',
+            'name' => $rule . '|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:1',
-            'stock' => 'required|integer|min:0',
+            'price' => $rule . '|numeric|min:1',
+            'stock' => $rule . '|integer|min:0',
         ];
     }
 }

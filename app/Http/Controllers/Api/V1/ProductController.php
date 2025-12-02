@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Http\Resources\ProductCollection;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -15,8 +17,11 @@ class ProductController extends Controller
      */
     public function index()
     {
+        // Obtiene todos los productos
+        $productos = Product::all();
+        
         // Devuelve la lista de productos
-        return response()->json(Product::all(), 200);
+        return new ProductCollection($productos);
     }
 
     /**
@@ -27,7 +32,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         // Devuelve el producto
-        return response()->json($product, 200);
+        return new ProductResource($product);
     }
 
     /**
@@ -47,7 +52,9 @@ class ProductController extends Controller
 
         // Busca productos por nombre o precio
         $products = Product::where('name', 'LIKE', "%$data%")->orWhere('price', 'LIKE', "%$data%")->get();
-        return response()->json($products, 200);
+
+        // Devuelve los productos encontrados
+        return new ProductCollection($products);
     }
 
     /**
@@ -59,7 +66,9 @@ class ProductController extends Controller
     {
         // Crea un nuevo producto
         $product = Product::create($request->validated());
-        return response()->json($product, 201);
+
+        // Devuelve el producto creado
+        return new ProductResource($product);
     }
 
     /**
@@ -72,7 +81,9 @@ class ProductController extends Controller
     {
         // Actualiza el producto seleccionado
         $product->update($request->validated());
-        return response()->json($product, 200);
+
+        // Devuelve el producto actualizado
+        return new ProductResource($product);
     }
 
     /**
@@ -84,6 +95,8 @@ class ProductController extends Controller
     {
         // Elimina el producto seleccionado
         $product->delete();
-        return response()->json(null, 204);
+
+        // Devuelve una respuesta de éxito
+        return response()->json(['message' => 'Producto eliminado correctamente.'], 200);
     }
 }
