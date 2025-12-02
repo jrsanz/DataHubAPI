@@ -32,8 +32,17 @@ Route::prefix('v1')->group(function () {
         Route::post('users/logout', [UserController::class, 'logout']);
         Route::get('users/me', [UserController::class, 'me']);
 
-        // Product Routes
-        Route::get('products/search', [ProductController::class, 'search']);
-        Route::apiResource('products', ProductController::class);
+        // Solo usuarios con rol 'user' o 'admin' pueden consultar y buscar productos
+        Route::middleware('role:user,admin')->group(function () {
+            Route::get('products', [ProductController::class, 'index']);
+            Route::get('products/{product}', [ProductController::class, 'show']);
+            Route::get('products/search', [ProductController::class, 'search']);
+        });
+
+        // Solo usuarios con rol 'admin' pueden gestionar productos
+        Route::middleware('role:admin')->group(function () {
+            // Product Routes
+            Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+        });
     });
 });

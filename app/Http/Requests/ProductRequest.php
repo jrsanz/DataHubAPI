@@ -26,7 +26,7 @@ class ProductRequest extends FormRequest
         $rule = $isUpdate ? 'sometimes' : 'required';
 
         // Valida si el request es de actualización y no hay datos
-        if (empty($this->all() && $isUpdate)) {
+        if (empty($this->all()) && $isUpdate) {
             abort(response()->json(['message' => 'Es necesario enviar datos para actualizar el producto.'], 422));
         }
 
