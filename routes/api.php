@@ -35,8 +35,8 @@ Route::prefix('v1')->group(function () {
         // Solo usuarios con rol 'user' o 'admin' pueden consultar y buscar productos
         Route::middleware('role:user,admin')->group(function () {
             Route::get('products', [ProductController::class, 'index']);
-            Route::get('products/{product}', [ProductController::class, 'show']);
             Route::get('products/search', [ProductController::class, 'search']);
+            Route::get('products/{product}', [ProductController::class, 'show']);
         });
 
         // Solo usuarios con rol 'admin' pueden gestionar productos

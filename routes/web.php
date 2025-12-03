@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Redirecciona la raíz a la documentación de la API
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/api/documentation');
 });
